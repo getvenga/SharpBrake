@@ -185,7 +185,7 @@ namespace SharpBrake
             catch (WebException exception)
             {
                 // Since an exception was already thrown, allowing another one to bubble up is pointless
-                this.log.Fatal("An error occurred while retrieving the web response", exception);
+                this.log.Fatal(exception, "An error occurred while retrieving the web response");
                 response = exception.Response;
             }
 
