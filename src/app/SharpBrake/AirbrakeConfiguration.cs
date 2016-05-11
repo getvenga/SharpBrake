@@ -10,6 +10,8 @@ namespace SharpBrake
     /// </summary>
     public class AirbrakeConfiguration
     {
+        private readonly string[] _developmentEnvironments;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AirbrakeConfiguration"/> class.
         /// </summary>
@@ -23,9 +25,13 @@ namespace SharpBrake
             ProjectRoot = HttpRuntime.AppDomainAppVirtualPath ?? Environment.CurrentDirectory;
 
             string[] values = ConfigurationManager.AppSettings.GetValues("Airbrake.AppVersion");
-            
+
             if (values != null)
+            {
                 AppVersion = values.FirstOrDefault();
+            }
+            string devEnvironmentList = ConfigurationManager.AppSettings["Airbrake.DevelopmentEnvironments"];
+            _developmentEnvironments = !string.IsNullOrEmpty(devEnvironmentList) ? devEnvironmentList.Split(',') : new []{ "development" };
         }
 
 
@@ -69,5 +75,19 @@ namespace SharpBrake
         /// The project root.
         /// </value>
         public string ProjectRoot { get; set; }
+
+        /// <summary>
+        /// Gets the environment names configured as development. Defaults to "development".
+        /// </summary>
+        /// <remarks>
+        /// Any errors generated in these environments will not be reported to Airbrake.
+        /// </remarks>
+        /// <value>
+        /// The list of development environments.
+        /// </value>
+        public string[] DevelopmentEnvironments
+        {
+            get { return _developmentEnvironments; }
+        }
     }
 }

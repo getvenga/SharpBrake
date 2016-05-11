@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Configuration;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using NLog;
@@ -94,6 +96,12 @@ namespace SharpBrake
                     notice.ApiKey = this.builder.Configuration.ApiKey;
                 }
 
+                if (configuration.DevelopmentEnvironments.Any(e => e.ToLower(CultureInfo.InvariantCulture) == notice.ServerEnvironment.EnvironmentName.ToLower(CultureInfo.InvariantCulture)))
+                {
+                    // Development environment, don't send to Airbrake.
+                    this.log.Warn($"Not sending notice to Airbrake since [{notice.ServerEnvironment.EnvironmentName}] is configured as a development environment");
+                    return;
+                }
                 // Create the web request
                 var request = WebRequest.Create(this.configuration.ServerUri) as HttpWebRequest;
 
