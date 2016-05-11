@@ -10,3 +10,6 @@ Hoptoad.config
 *.user
 /src/packages/
 *.nupkg
+/src/.vs/
+/src/Backup
+**/UpgradeLog.htm
