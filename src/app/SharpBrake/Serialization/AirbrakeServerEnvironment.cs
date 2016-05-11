@@ -15,7 +15,7 @@ namespace SharpBrake.Serialization
         public AirbrakeServerEnvironment(string environmentName)
         {
             if (environmentName == null)
-                throw new ArgumentNullException("environmentName");
+                throw new ArgumentNullException(nameof(environmentName));
 
             EnvironmentName = environmentName;
             Hostname = Environment.MachineName;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 
 using SharpBrake.Serialization;
@@ -21,6 +22,23 @@ namespace SharpBrake
             client.Send(exception);
         }
 
+        /// <summary>
+        /// Sends the <paramref name="exception" /> to Airbrake with the included <paramref name="cgiData" />.
+        /// </summary>
+        /// <param name="exception">The exception to send to Airbrake.</param>
+        /// <param name="cgiData">The cgi data to send along with the exception.</param>
+        public static void SendToAirbrake(Exception exception, IDictionary<string, string> cgiData)
+        {
+            SendToAirbrake(exception, cgiData, new AirbrakeClient());
+        }
+
+        // For testing.
+        internal static void SendToAirbrake(Exception exception, IDictionary<string, string> cgiData, AirbrakeClient client)
+        {
+            var notice = client.Builder.Notice(exception);
+            notice.Request.CgiData = cgiData.Select(kvp => new AirbrakeVar(kvp.Key, kvp.Value)).ToArray();
+            client.Send(notice);
+        }
 
         /// <summary>
         /// Builds the errors from the <see cref="XmlReader"/>.
@@ -32,7 +50,7 @@ namespace SharpBrake
         internal static IEnumerable<AirbrakeResponseError> BuildErrors(this XmlReader reader)
         {
             if (reader == null)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
 
             while (reader.Read())
             {
@@ -57,7 +75,7 @@ namespace SharpBrake
         internal static AirbrakeResponseNotice BuildNotice(this XmlReader reader)
         {
             if (reader == null)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
 
             int id = 0;
             int errorId = 0;

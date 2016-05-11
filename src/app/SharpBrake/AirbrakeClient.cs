@@ -41,6 +41,13 @@ namespace SharpBrake
             this.log = LogManager.GetCurrentClassLogger();
         }
 
+        /// <summary>
+        /// The <see cref="AirbrakeNoticeBuilder" /> associated with this client instance.
+        /// </summary>
+        public AirbrakeNoticeBuilder Builder
+        {
+            get { return builder; }
+        }
 
         /// <summary>
         /// Occurs when the request ends.
@@ -52,7 +59,7 @@ namespace SharpBrake
         /// Sends the specified exception to Airbrake.
         /// </summary>
         /// <param name="exception">The e.</param>
-        public void Send(Exception exception)
+        public virtual void Send(Exception exception)
         {
             AirbrakeNotice notice = this.builder.Notice(exception);
 
@@ -68,7 +75,7 @@ namespace SharpBrake
         /// Sends the specified notice to Airbrake.
         /// </summary>
         /// <param name="notice">The notice.</param>
-        public void Send(AirbrakeNotice notice)
+        public virtual void Send(AirbrakeNotice notice)
         {
             this.log.Debug("{0}.Send({1})", GetType(), notice);
 

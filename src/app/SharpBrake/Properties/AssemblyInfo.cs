@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly : AssemblyTitle("SharpBrake")]
@@ -13,3 +14,4 @@ using System.Runtime.InteropServices;
 [assembly : Guid("25ce95a4-58dd-4408-8484-e71f3c03549c")]
 [assembly : AssemblyVersion("2.2.1")]
 [assembly : AssemblyFileVersion("2.2.1")]
+[assembly : InternalsVisibleTo("SharpBrake.Tests")]
