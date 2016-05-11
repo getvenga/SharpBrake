@@ -31,9 +31,7 @@ namespace SharpBrake.Tests
             var serializer = new CleanXmlSerializer<TestNotice>();
             string xml = serializer.ToXml(notice);
 
-            const string expected = @"<notice version=""2.0"">
-  <api-key>123456</api-key>
-</notice>";
+            const string expected = "<notice version=\"2.0\">\r\n  <api-key>123456</api-key>\r\n</notice>";
             Assert.AreEqual(expected, xml);
         }
     }
