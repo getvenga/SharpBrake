@@ -6,9 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.SessionState;
-
-using Common.Logging;
-
+using NLog;
 using SharpBrake.Serialization;
 
 namespace SharpBrake
@@ -19,7 +17,7 @@ namespace SharpBrake
     public class AirbrakeNoticeBuilder
     {
         private readonly AirbrakeConfiguration configuration;
-        private readonly ILog log;
+        private readonly ILogger log;
         private AirbrakeServerEnvironment environment;
         private AirbrakeNotifier notifier;
 
@@ -40,10 +38,10 @@ namespace SharpBrake
         public AirbrakeNoticeBuilder(AirbrakeConfiguration configuration)
         {
             if (configuration == null)
-                throw new ArgumentNullException("configuration");
+                throw new ArgumentNullException(nameof(configuration));
 
             this.configuration = configuration;
-            this.log = LogManager.GetLogger(GetType());
+            this.log = LogManager.GetCurrentClassLogger();
         }
 
 
@@ -98,9 +96,9 @@ namespace SharpBrake
         public AirbrakeError ErrorFromException(Exception exception)
         {
             if (exception == null)
-                throw new ArgumentNullException("exception");
+                throw new ArgumentNullException(nameof(exception));
 
-            this.log.Debug(f => f("{0}.Notice({1})", GetType(), exception.GetType()), exception);
+            this.log.Debug(exception, "{0}.Notice({1})", GetType(), exception.GetType());
 
             MethodBase catchingMethod;
             var backtrace = BuildBacktrace(exception, out catchingMethod);
@@ -123,7 +121,7 @@ namespace SharpBrake
         /// <returns></returns>
         public AirbrakeNotice Notice(AirbrakeError error)
         {
-            this.log.Debug(f => f("{0}.Notice({1})", GetType(), error));
+            this.log.Debug("{0}.Notice({1})", GetType(), error);
 
             var notice = new AirbrakeNotice
             {
@@ -153,9 +151,9 @@ namespace SharpBrake
         public AirbrakeNotice Notice(Exception exception)
         {
             if (exception == null)
-                throw new ArgumentNullException("exception");
+                throw new ArgumentNullException(nameof(exception));
 
-            this.log.Info(f => f("{0}.Notice({1})", GetType(), exception.GetType()), exception);
+            this.log.Info(exception, "{0}.Notice({1})", GetType(), exception.GetType());
 
             AirbrakeError error = ErrorFromException(exception);
 
@@ -272,7 +270,7 @@ namespace SharpBrake
 
                 if (lineNumber == 0)
                 {
-                    this.log.Debug(f => f("No line number found in {0}, using IL offset instead.", method));
+                    this.log.Debug("No line number found in {0}, using IL offset instead.", method);
                     lineNumber = frame.GetILOffset();
                 }
 
@@ -303,7 +301,7 @@ namespace SharpBrake
         {
             if ((cookies == null) || (cookies.Count == 0))
             {
-                this.log.Debug(f => f("No cookies to build vars from."));
+                this.log.Debug("No cookies to build vars from.");
                 return new AirbrakeVar[0];
             }
 
@@ -320,7 +318,7 @@ namespace SharpBrake
         {
             if ((formData == null) || (formData.Count == 0))
             {
-                this.log.Debug(f => f("No form data to build vars from."));
+                this.log.Debug("No form data to build vars from.");
                 return new AirbrakeVar[0];
             }
 
@@ -336,7 +334,7 @@ namespace SharpBrake
         {
             if ((session == null) || (session.Count == 0))
             {
-                this.log.Debug(f => f("No session to build vars from."));
+                this.log.Debug("No session to build vars from.");
                 return new AirbrakeVar[0];
             }
 

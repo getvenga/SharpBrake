@@ -3,9 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml;
-
-using Common.Logging;
-
+using NLog;
 using SharpBrake.Serialization;
 
 namespace SharpBrake
@@ -21,7 +19,7 @@ namespace SharpBrake
         private readonly WebHeaderCollection headers;
         private readonly bool isFromCache;
         private readonly bool isMutuallyAuthenticated;
-        private readonly ILog log;
+        private readonly ILogger log;
         private readonly Uri responseUri;
         private AirbrakeResponseError[] errors;
 
@@ -33,7 +31,7 @@ namespace SharpBrake
         /// <param name="content">The content.</param>
         public AirbrakeResponse(WebResponse response, string content)
         {
-            this.log = LogManager.GetLogger(GetType());
+            this.log = LogManager.GetCurrentClassLogger();
             this.content = content;
             this.errors = new AirbrakeResponseError[0];
 
@@ -55,9 +53,7 @@ namespace SharpBrake
             }
             catch (Exception exception)
             {
-                this.log.Fatal(f => f(
-                    "An error occurred while deserializing the following content:\n{0}", content),
-                               exception);
+                this.log.Fatal(exception, "An error occurred while deserializing the following content:\n{0}", content);
             }
         }
 

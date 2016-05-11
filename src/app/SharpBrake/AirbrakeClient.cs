@@ -3,9 +3,7 @@ using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Text;
-
-using Common.Logging;
-
+using NLog;
 using SharpBrake.Serialization;
 
 namespace SharpBrake
@@ -17,7 +15,7 @@ namespace SharpBrake
     {
         private readonly AirbrakeNoticeBuilder builder;
         private readonly AirbrakeConfiguration configuration;
-        private readonly ILog log;
+        private readonly ILogger log;
 
 
         /// <summary>
@@ -36,11 +34,11 @@ namespace SharpBrake
         public AirbrakeClient(AirbrakeConfiguration configuration)
         {
             if (configuration == null)
-                throw new ArgumentNullException("configuration");
+                throw new ArgumentNullException(nameof(configuration));
 
             this.configuration = configuration;
             this.builder = new AirbrakeNoticeBuilder(configuration);
-            this.log = LogManager.GetLogger(GetType());
+            this.log = LogManager.GetCurrentClassLogger();
         }
 
 
@@ -72,7 +70,7 @@ namespace SharpBrake
         /// <param name="notice">The notice.</param>
         public void Send(AirbrakeNotice notice)
         {
-            this.log.Debug(f => f("{0}.Send({1})", GetType(), notice));
+            this.log.Debug("{0}.Send({1})", GetType(), notice);
 
             try
             {
@@ -94,7 +92,7 @@ namespace SharpBrake
 
                 if (request == null)
                 {
-                    this.log.Fatal(f => f("Couldn't create a request to '{0}'.", this.configuration.ServerUri));
+                    this.log.Fatal("Couldn't create a request to '{0}'.", this.configuration.ServerUri);
                     return;
                 }
 
@@ -114,7 +112,7 @@ namespace SharpBrake
             }
             catch (Exception exception)
             {
-                this.log.Fatal("An error occurred while trying to send to Airbrake.", exception);
+                this.log.Fatal(exception, "An error occurred while trying to send to Airbrake.");
             }
         }
 
@@ -123,7 +121,7 @@ namespace SharpBrake
         {
             if (response == null)
             {
-                this.log.Fatal(f => f("No response received!"));
+                this.log.Fatal("No response received!");
                 return;
             }
 
@@ -137,7 +135,7 @@ namespace SharpBrake
                 using (var sr = new StreamReader(responseStream))
                 {
                     responseBody = sr.ReadToEnd();
-                    this.log.Debug(f => f("Received from Airbrake.\n{0}", responseBody));
+                    this.log.Debug("Received from Airbrake.\n{0}", responseBody);
                 }
             }
 
@@ -151,18 +149,14 @@ namespace SharpBrake
 
         private void RequestCallback(IAsyncResult result)
         {
-            this.log.Debug(f => f("{0}.RequestCallback({1})", GetType(), result));
+            this.log.Debug("{0}.RequestCallback({1})", GetType(), result);
 
             // Get it back
             var request = result.AsyncState as HttpWebRequest;
 
             if (request == null)
             {
-                this.log.Fatal(
-                    f => f(
-                        "{0}.AsyncState was null or not of type {1}.",
-                        typeof(IAsyncResult),
-                        typeof(HttpWebRequest)));
+                this.log.Fatal("{0}.AsyncState was null or not of type {1}.", typeof(IAsyncResult), typeof(HttpWebRequest));
                 return;
             }
 
@@ -189,7 +183,7 @@ namespace SharpBrake
             var serializer = new CleanXmlSerializer<AirbrakeNotice>();
             string xml = serializer.ToXml(notice);
 
-            this.log.Debug(f => f("Sending the following to '{0}':\n{1}", request.RequestUri, xml));
+            this.log.Debug("Sending the following to '{0}':\n{1}", request.RequestUri, xml);
 
             byte[] payload = Encoding.UTF8.GetBytes(xml);
             request.ContentLength = payload.Length;
