@@ -93,8 +93,8 @@ namespace SharpBrake.Tests
             // since it requires HttpSimulator which in turn requires .NET 4.0, which in turn requires Visual Studio 2010.
             Assert.That(notice.Request, Is.Not.Null);
             Assert.That(notice.Request.Url, Is.EqualTo(url));
-            Assert.That(notice.Request.Component, Is.EqualTo(PathToFile("Thrower.cs")));
-            Assert.That(notice.Request.Action, Is.EqualTo("Throw"));
+            Assert.That(notice.Request.Component, Is.EqualTo(PathToFile("NoticeComponentsCreation.cs")));
+            Assert.That(notice.Request.Action, Is.EqualTo("Notice_contains_Request"));
 
             Assert.That(notice.Request.CgiData,
                         Contains.Item(new AirbrakeVar("Content-Type", "application/x-www-form-urlencoded")));
@@ -135,7 +135,7 @@ namespace SharpBrake.Tests
             AirbrakeNotifier notifier = this.builder.Notifier;
             Assert.That(notifier.Name, Is.EqualTo("SharpBrake"));
             Assert.That(notifier.Url, Is.EqualTo("https://github.com/asbjornu/SharpBrake"));
-            Assert.That(notifier.Version, Is.EqualTo("2.2.1.0"));
+            Assert.That(notifier.Version, Is.EqualTo("2.3.0.0"));
         }
 
 

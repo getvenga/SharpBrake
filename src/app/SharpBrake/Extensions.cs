@@ -27,7 +27,7 @@ namespace SharpBrake
         /// </summary>
         /// <param name="exception">The exception to send to Airbrake.</param>
         /// <param name="cgiData">The cgi data to send along with the exception.</param>
-        public static void SendToAirbrake(Exception exception, IDictionary<string, string> cgiData)
+        public static void SendToAirbrake(this Exception exception, IDictionary<string, string> cgiData)
         {
             SendToAirbrake(exception, cgiData, new AirbrakeClient());
         }
