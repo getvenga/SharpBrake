@@ -36,7 +36,7 @@ namespace SharpBrake
         internal static void SendToAirbrake(Exception exception, IDictionary<string, string> cgiData, AirbrakeClient client)
         {
             var notice = client.Builder.Notice(exception);
-            notice.Request.CgiData = cgiData.Select(kvp => new AirbrakeVar(kvp.Key, kvp.Value)).ToArray();
+            notice.Request.AddCgiData(cgiData.Select(kvp => new AirbrakeVar(kvp.Key, kvp.Value)));
             client.Send(notice);
         }
 
@@ -134,6 +134,24 @@ namespace SharpBrake
             catch (Exception)
             {
                 return default(TResult);
+            }
+        }
+
+        /// <summary>
+        /// Adds the supplied <paramref name="cgiData"/> to the request.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <param name="cgiData">The additional data to add.</param>
+        internal static void AddCgiData(this AirbrakeRequest request, IEnumerable<AirbrakeVar> cgiData)
+        {
+            var existingCgiData = request.CgiData;
+            if (existingCgiData != null)
+            {
+                request.CgiData = existingCgiData.Concat(cgiData).ToArray();
+            }
+            else
+            {
+                request.CgiData = cgiData.ToArray();
             }
         }
     }

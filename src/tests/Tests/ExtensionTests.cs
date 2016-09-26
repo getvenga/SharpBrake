@@ -24,8 +24,8 @@ namespace SharpBrake.Tests
             Extensions.SendToAirbrake(exception, cgiData, client.Object);
             Assert.NotNull(notice);
             Assert.That(notice.Request, Is.Not.Null);
-            Assert.That(notice.Request.CgiData.Length, Is.EqualTo(2));
-            Assert.That(notice.Request.CgiData[0].Key, Is.EqualTo("key1"));
+            Assert.That(notice.Request.CgiData.Length, Is.GreaterThanOrEqualTo(2));
+            Assert.That(notice.Request.CgiData, Contains.Item(new AirbrakeVar("key1", "value1")));
         }
     }
 }
