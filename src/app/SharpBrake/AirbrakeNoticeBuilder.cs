@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Web;
 using System.Web.SessionState;
@@ -16,6 +17,7 @@ namespace SharpBrake
     /// </summary>
     public class AirbrakeNoticeBuilder
     {
+        private static string _ec2InstanceId;
         private readonly AirbrakeConfiguration configuration;
         private readonly ILogger log;
         private AirbrakeServerEnvironment environment;
@@ -193,6 +195,7 @@ namespace SharpBrake
                 new AirbrakeVar("Environment.Version", Environment.Version),
                 new AirbrakeVar("Environment.IpAddress", IpAddressHelper.GetFirstAddress())
             };
+            TryAddInstanceId(cgiData);
 
             var parameters = new List<AirbrakeVar>();
             var session = new List<AirbrakeVar>();
@@ -345,6 +348,30 @@ namespace SharpBrake
                    let value = v != null ? v.ToString() : null
                    where !String.IsNullOrEmpty(value)
                    select new AirbrakeVar(key, value);
+        }
+
+        private void TryAddInstanceId(List<AirbrakeVar> cgiData)
+        {
+            if (!string.IsNullOrEmpty(_ec2InstanceId))
+            {
+                cgiData.Add(new AirbrakeVar("Environment.InstanceId", _ec2InstanceId));
+            }
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("http://169.254.169.254/latest/meta-data/instance-id");
+                request.Timeout = 2000;
+                using (var response = request.GetResponse())
+                using (var responseStream = response.GetResponseStream())
+                using (var sr = new System.IO.StreamReader(responseStream))
+                {
+                    _ec2InstanceId = sr.ReadToEnd();
+                }
+            }
+            catch
+            {
+                _ec2InstanceId = "not-aws";
+            }
+            cgiData.Add(new AirbrakeVar("Environment.InstanceId", _ec2InstanceId));
         }
     }
 }
