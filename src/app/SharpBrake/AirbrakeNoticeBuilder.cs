@@ -190,7 +190,8 @@ namespace SharpBrake
             {
                 new AirbrakeVar("Environment.MachineName", Environment.MachineName),
                 new AirbrakeVar("Environment.OSversion", Environment.OSVersion),
-                new AirbrakeVar("Environment.Version", Environment.Version)
+                new AirbrakeVar("Environment.Version", Environment.Version),
+                new AirbrakeVar("Environment.IpAddress", IpAddressHelper.GetFirstAddress())
             };
 
             var parameters = new List<AirbrakeVar>();
