@@ -17,7 +17,7 @@ namespace SharpBrake.Serialization
             if (environmentName == null)
                 throw new ArgumentNullException(nameof(environmentName));
 
-            EnvironmentName = environmentName;
+            EnvironmentName = environmentName.ToLower(System.Globalization.CultureInfo.InvariantCulture);
             Hostname = Environment.MachineName;
         }
 
