@@ -355,6 +355,7 @@ namespace SharpBrake
             if (!string.IsNullOrEmpty(_ec2InstanceId))
             {
                 cgiData.Add(new AirbrakeVar("Environment.InstanceId", _ec2InstanceId));
+                return;
             }
             try
             {
